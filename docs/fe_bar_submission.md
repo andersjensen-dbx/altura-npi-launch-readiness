@@ -53,4 +53,4 @@ The AI caught and fixed real issues. One example: the risk score and the ramp ch
 
 **GitHub repo link:** https://github.com/andersjensen-dbx/altura-npi-launch-readiness
 
-**Presentation deck:** [`docs/deck.pdf`](deck.pdf) (12 slides, outcome first, with a live-demo slot), talk track in [`docs/demo_talk_track.md`](demo_talk_track.md).
+**Presentation deck:** [`docs/deck.pdf`](deck.pdf) (6 slides: use case and value, architecture, live demo, what it means, next steps), talk track in [`docs/demo_talk_track.md`](demo_talk_track.md).
