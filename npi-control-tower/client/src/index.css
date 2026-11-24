@@ -1,0 +1,97 @@
+@import "@databricks/appkit-ui/styles.css";
+
+/* Altura-inspired theme: Altura red as the brand/primary accent on a clean white/charcoal industrial UI.
+   Semantic tokens (destructive / warning / success) carry risk meaning; brand red is used for chrome & CTAs. */
+:root.light, :root {
+  color-scheme: light;
+  --radius: 0.5rem;
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.2 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0 0);
+  --primary: oklch(0.578 0.237 29.2);          /* Altura red (AA on white) */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.955 0 0);
+  --secondary-foreground: oklch(0.25 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.48 0 0);
+  --accent: oklch(0.955 0.012 25);
+  --accent-foreground: oklch(0.25 0 0);
+  --destructive: oklch(0.5 0.2 25);            /* HIGH risk: deeper crimson, distinct from brand red */
+  --destructive-foreground: oklch(1 0 0);
+  --warning: oklch(0.76 0.16 70);
+  --warning-foreground: oklch(0.22 0.03 60);
+  --success: oklch(0.56 0.12 160);
+  --success-foreground: oklch(1 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.578 0.237 29.2);
+  /* Chart tokens in hex: ECharts cannot parse oklch() when deriving hover colors (bars vanished on hover). */
+  --chart-1: #e40101;           /* red */
+  --chart-2: #333333;                   /* charcoal */
+  --chart-3: #8f8f8f;                   /* steel gray */
+  --chart-4: #f09c17;               /* amber */
+  --chart-5: #008890;              /* teal */
+  font-family: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+}
+
+/* Theme is chosen in the header (Light / Dark) and stored per browser; <html> carries `light` or `dark`.
+   `:root.dark` outranks AppKit's own `.dark` palette so the Altura tokens (brand red, risk colors) win in both themes. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root.dark {
+  color-scheme: dark;
+  --background: oklch(0.17 0 0);
+  --foreground: oklch(0.96 0 0);
+  --card: oklch(0.21 0 0);
+  --card-foreground: oklch(0.96 0 0);
+  --popover: oklch(0.23 0 0);
+  --popover-foreground: oklch(0.96 0 0);
+  --primary: oklch(0.63 0.23 29.2);            /* Altura red, lifted for contrast on charcoal */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.27 0 0);
+  --secondary-foreground: oklch(0.96 0 0);
+  --muted: oklch(0.27 0 0);
+  --muted-foreground: oklch(0.72 0 0);
+  --accent: oklch(0.28 0.02 25);
+  --accent-foreground: oklch(0.96 0 0);
+  --destructive: oklch(0.62 0.2 25);
+  --destructive-foreground: oklch(1 0 0);
+  --warning: oklch(0.78 0.15 75);
+  --warning-foreground: oklch(0.2 0.03 60);
+  --success: oklch(0.66 0.12 160);
+  --success-foreground: oklch(0.15 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.63 0.23 29.2);
+  --chart-1: #f53226;
+  --chart-2: #cecece;
+  --chart-3: #8f8f8f;
+  --chart-4: #f2a93b;
+  --chart-5: #22a7ae;
+  --tone-ok: oklch(0.75 0.13 160);
+  --tone-warn: oklch(0.8 0.14 75);
+  --tone-bad: oklch(0.72 0.17 25);
+  --tone-info: oklch(0.75 0.11 235);
+}
+
+/* Status text/outline tones with AA contrast in both themes (light values below, dark above). */
+:root {
+  --tone-ok: oklch(0.5 0.11 160);
+  --tone-warn: oklch(0.52 0.12 60);
+  --tone-bad: oklch(0.5 0.19 25);
+  --tone-info: oklch(0.5 0.12 240);
+}
+.tone-ok { color: var(--tone-ok); border-color: var(--tone-ok); }
+.tone-warn { color: var(--tone-warn); border-color: var(--tone-warn); }
+.tone-bad { color: var(--tone-bad); border-color: var(--tone-bad); }
+.tone-info { color: var(--tone-info); border-color: var(--tone-info); }
+
+.brand-wordmark {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--primary);
+}

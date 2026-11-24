@@ -1,0 +1,17 @@
+resources:
+  pipelines:
+    npi_ingest:
+      name: npi-launch-readiness-ingest
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      continuous: false
+      photon: true
+      channel: current
+      root_path: ../src/pipelines/npi_ingest
+      libraries:
+        - glob:
+            include: ../src/pipelines/npi_ingest/transformations/**
+      configuration:
+        landing: /Volumes/${var.catalog}/${var.schema}/landing
+        as_of_date: ${var.as_of_date}

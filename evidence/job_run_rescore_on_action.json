@@ -1,0 +1,35 @@
+{
+  "job": "npi-launch-readiness-rescore-on-action",
+  "run_id": 350095189727050,
+  "trigger": "ONE_TIME",
+  "state": "SUCCESS",
+  "start": "2026-11-23T18:43:47Z",
+  "end": "2026-11-23T18:45:52Z",
+  "tasks": [
+    {
+      "task_key": "sync_scores",
+      "result": "SUCCESS",
+      "duration_s": 42
+    },
+    {
+      "task_key": "sync_history",
+      "result": "SUCCESS",
+      "duration_s": 32
+    },
+    {
+      "task_key": "score_launches",
+      "result": "SUCCESS",
+      "duration_s": 82
+    },
+    {
+      "task_key": "sync_components",
+      "result": "SUCCESS",
+      "duration_s": 32
+    },
+    {
+      "task_key": "sync_curve",
+      "result": "SUCCESS",
+      "duration_s": 42
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+# Lakeflow Jobs orchestrating the end-to-end NPI Launch Readiness data journey.
+variables:
+  sync_pipeline_scores: {default: 6f5a82e6-36f1-4547-98a8-6fe1e684f19f}
+  sync_pipeline_components: {default: af85fb4f-855d-480f-b8fd-9df805344606}
+  sync_pipeline_curve: {default: 8b5866bf-0e27-4a6d-bee7-3bb8a8aa2ec5}
+  sync_pipeline_history: {default: 9071ee9d-230e-4444-8ac8-605ca4a0dee9}
+  sync_pipeline_briefs: {default: a6f458a5-d9ea-4752-9c4f-d61c46fa73f9}
+
+resources:
+  jobs:
+    # ------------------------------------------------------------------------------
+    # Daily: ingest new SAP/MES/PLM/EDI drops -> score -> GenAI briefs -> push to Lakebase
+    # ------------------------------------------------------------------------------
+    npi_daily_refresh:
+      name: npi-launch-readiness-daily-refresh
+      description: Lakeflow ingest -> ML risk scoring -> GenAI briefs -> Lakebase serving sync
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: America/Chicago
+        pause_status: PAUSED
+      environments:
+        - environment_key: ml
+          spec:
+            environment_version: "5"
+            dependencies: ["mlflow>=3.8,<3.9", "shap", "psycopg[binary]"]
+      parameters:
+        - {name: llm_endpoint, default: "${var.llm_endpoint}"}
+      tasks:
+        - task_key: ingest
+          pipeline_task: {pipeline_id: "${resources.pipelines.npi_ingest.id}"}
+        - task_key: score_launches
+          depends_on: [{task_key: ingest}]
+          environment_key: ml
+          notebook_task: {notebook_path: ../notebooks/04_score_launches.ipynb}
+        - task_key: genai_briefs
+          depends_on: [{task_key: score_launches}]
+          environment_key: ml
+          notebook_task: {notebook_path: ../notebooks/06_genai_launch_briefs.ipynb}
+        - task_key: sync_scores
+          depends_on: [{task_key: score_launches}]
+          pipeline_task: {pipeline_id: "${var.sync_pipeline_scores}"}
+        - task_key: sync_components
+          depends_on: [{task_key: score_launches}]
+          pipeline_task: {pipeline_id: "${var.sync_pipeline_components}"}
+        - task_key: sync_curve
+          depends_on: [{task_key: score_launches}]
+          pipeline_task: {pipeline_id: "${var.sync_pipeline_curve}"}
+        - task_key: sync_history
+          depends_on: [{task_key: score_launches}]
+          pipeline_task: {pipeline_id: "${var.sync_pipeline_history}"}
+        - task_key: sync_briefs
+          depends_on: [{task_key: genai_briefs}]
+          pipeline_task: {pipeline_id: "${var.sync_pipeline_briefs}"}
+
+    # ------------------------------------------------------------------------------
+    # Event-driven closed loop: a mitigation committed in the app (Lakebase) lands in UC via
+    # Lakehouse Sync -> table-update trigger -> re-score -> synced back to the app in minutes.
+    # ------------------------------------------------------------------------------
+    npi_rescore_on_action:
+      name: npi-launch-readiness-rescore-on-action
+      description: Re-score launches when mitigation actions change in Lakebase (closed loop)
+      trigger:
+        pause_status: UNPAUSED
+        table_update:
+          table_names:
+            - ${var.catalog}.${var.schema}.lb_mitigation_actions_history
+          condition: ANY_UPDATED
+          min_time_between_triggers_seconds: 60
+          wait_after_last_change_seconds: 61
+      max_concurrent_runs: 1
+      queue: {enabled: true}
+      environments:
+        - environment_key: ml
+          spec:
+            environment_version: "5"
+            dependencies: ["mlflow>=3.8,<3.9", "shap"]
+      tasks:
+        - task_key: score_launches
+          environment_key: ml
+          notebook_task: {notebook_path: ../notebooks/04_score_launches.ipynb}
+        - task_key: sync_scores
+          depends_on: [{task_key: score_launches}]
+          pipeline_task: {pipeline_id: "${var.sync_pipeline_scores}"}
+        - task_key: sync_components
+          depends_on: [{task_key: score_launches}]
+          pipeline_task: {pipeline_id: "${var.sync_pipeline_components}"}
+        - task_key: sync_curve
+          depends_on: [{task_key: score_launches}]
+          pipeline_task: {pipeline_id: "${var.sync_pipeline_curve}"}
+        - task_key: sync_history
+          depends_on: [{task_key: score_launches}]
+          pipeline_task: {pipeline_id: "${var.sync_pipeline_history}"}
+
+    # ------------------------------------------------------------------------------
+    # Monthly retrain (new post-mortems + MES yields) with UC champion promotion
+    # ------------------------------------------------------------------------------
+    npi_model_training:
+      name: npi-launch-readiness-model-training
+      schedule:
+        quartz_cron_expression: "0 0 5 1 * ?"
+        timezone_id: America/Chicago
+        pause_status: PAUSED
+      environments:
+        - environment_key: ml
+          spec:
+            environment_version: "5"
+            dependencies: ["mlflow>=3.8,<3.9", "shap"]
+      tasks:
+        - task_key: train_models
+          environment_key: ml
+          notebook_task: {notebook_path: ../notebooks/03_train_models.ipynb}

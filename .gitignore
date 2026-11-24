@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.databricks/
+.ipynb_checkpoints/
+node_modules/
+.env
+.DS_Store
+app/dist/
+app/client/dist/
+*.pyproject.toml.bak*
+mlflow.db
+mlruns/

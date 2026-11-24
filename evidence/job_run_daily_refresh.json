@@ -1,0 +1,57 @@
+{
+  "job": "npi-launch-readiness-daily-refresh",
+  "run_id": 176981648224616,
+  "state": "SUCCESS",
+  "start": "2026-11-23T16:46:22Z",
+  "end": "2026-11-23T16:52:29Z",
+  "tasks": [
+    {
+      "task_key": "sync_components",
+      "result": "SUCCESS",
+      "start": "2026-11-23T16:49:25Z",
+      "duration_s": 42
+    },
+    {
+      "task_key": "sync_scores",
+      "result": "SUCCESS",
+      "start": "2026-11-23T16:49:25Z",
+      "duration_s": 32
+    },
+    {
+      "task_key": "sync_briefs",
+      "result": "SUCCESS",
+      "start": "2026-11-23T16:51:46Z",
+      "duration_s": 42
+    },
+    {
+      "task_key": "sync_curve",
+      "result": "SUCCESS",
+      "start": "2026-11-23T16:49:25Z",
+      "duration_s": 42
+    },
+    {
+      "task_key": "score_launches",
+      "result": "SUCCESS",
+      "start": "2026-11-23T16:47:45Z",
+      "duration_s": 99
+    },
+    {
+      "task_key": "ingest",
+      "result": "SUCCESS",
+      "start": "2026-11-23T16:46:22Z",
+      "duration_s": 82
+    },
+    {
+      "task_key": "sync_history",
+      "result": "SUCCESS",
+      "start": "2026-11-23T16:49:25Z",
+      "duration_s": 42
+    },
+    {
+      "task_key": "genai_briefs",
+      "result": "SUCCESS",
+      "start": "2026-11-23T16:49:25Z",
+      "duration_s": 141
+    }
+  ]
+}

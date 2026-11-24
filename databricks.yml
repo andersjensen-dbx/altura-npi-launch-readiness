@@ -1,0 +1,44 @@
+# Altura Bonding & Tapes - NPI Launch Readiness Control Tower
+# Declarative Automation Bundle: pipeline, jobs, app and supporting resources.
+bundle:
+  name: npi-launch-readiness
+
+include:
+  - resources/*.yml
+
+sync:
+  exclude:
+    - npi-control-tower/**   # the Databricks App is deployed by its own bundle (npi-control-tower/databricks.yml)
+    - evidence/**
+    - docs/**
+
+variables:
+  catalog:
+    description: Unity Catalog catalog
+    default: andersjensen_fevm_3_catalog
+  schema:
+    description: Schema holding all NPI launch-readiness assets
+    default: npi_launch_readiness
+  as_of_date:
+    description: Demo "today" - active launches are evaluated as of this date
+    default: "2026-11-23"
+  warehouse_id:
+    description: SQL warehouse for Genie, dashboards and the app
+    default: ab67079061fe959d
+  llm_endpoint:
+    description: Foundation Model endpoint for GenAI briefs and the mitigation advisor agent
+    default: databricks-claude-sonnet-5-5
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://fevm-andersjensen-fevm-3.cloud.databricks.com
+      profile: fevm-andersjensen-fevm-3
+  demo:
+    mode: production
+    workspace:
+      host: https://fevm-andersjensen-fevm-3.cloud.databricks.com
+      profile: fevm-andersjensen-fevm-3
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/demo

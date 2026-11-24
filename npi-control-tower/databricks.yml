@@ -1,0 +1,68 @@
+bundle:
+  name: npi-control-tower
+
+variables:
+  advisor_endpoint:
+    description: Model Serving endpoint of the Mitigation Advisor agent
+    default: npi-mitigation-advisor
+  genie_space_id:
+    description: Default Genie Space ID
+  genie_space_name:
+    description: Genie Space display name
+  job_id:
+    description: Numeric Databricks job ID. Find it in the Jobs UI or via `databricks jobs list`.
+  postgres_branch:
+    description: Full Lakebase Postgres branch resource name. Obtain by running `databricks postgres list-branches {project-name}`, select the desired item from the output array and use its .name value. Requires the project resource name.
+  postgres_database:
+    description: Full Lakebase Postgres database resource name. Obtain by running `databricks postgres list-databases {branch-name}`, select the desired item from the output array and use its .name value. Requires the branch resource name.
+
+resources:
+  apps:
+    app:
+      name: "npi-control-tower"
+      description: "Altura BTD NPI Launch Readiness Control Tower"
+      source_code_path: ./
+
+      # Start the app automatically on deploy.
+      lifecycle:
+        started: true
+      # on-behalf-of-user: Genie answers and Mitigation Advisor tool calls run with the signed-in user's UC permissions
+      user_api_scopes:
+        - dashboards.genie
+        - serving.serving-endpoints
+        - sql
+
+      # The resources which this app has access to.
+      resources:
+        - name: genie-space
+          genie_space:
+            name: ${var.genie_space_name}
+            space_id: ${var.genie_space_id}
+            permission: CAN_RUN
+        - name: job
+          job:
+            id: ${var.job_id}
+            permission: CAN_MANAGE_RUN
+        - name: serving-endpoint
+          serving_endpoint:
+            name: ${var.advisor_endpoint}
+            permission: CAN_QUERY
+        - name: postgres
+          postgres:
+            branch: ${var.postgres_branch}
+            database: ${var.postgres_database}
+            permission: CAN_CONNECT_AND_CREATE
+
+targets:
+  default:
+    default: true
+    workspace:
+      host: https://fevm-andersjensen-fevm-3.cloud.databricks.com
+      profile: fevm-andersjensen-fevm-3
+
+    variables:
+      genie_space_id: 01f1e760da701d41bc74783d708e8de4
+      genie_space_name: Altura BTD - NPI Launch Readiness
+      job_id: 108562903298088
+      postgres_branch: projects/npi-readiness/branches/production
+      postgres_database: projects/npi-readiness/branches/production/databases/databricks-postgres
